@@ -7,8 +7,8 @@ WORKDIR /app
 # 复制package文件
 COPY package*.json ./
 
-# 安装依赖（使用npm ci提高安装速度和可重现性）
-RUN npm ci --only=production
+# 安装依赖（包含开发依赖，因为构建时需要TypeScript）
+RUN npm ci
 
 # 复制源代码
 COPY . .
@@ -18,6 +18,9 @@ RUN npm run build
 
 # 生产阶段 - 使用nginx提供静态文件服务
 FROM nginx:alpine AS production
+
+# 安装curl用于健康检查
+RUN apk add --no-cache curl
 
 # 复制自定义nginx配置
 COPY nginx.conf /etc/nginx/nginx.conf
