@@ -1,8 +1,6 @@
 # 🚀 完整全栈应用 Docker Compose 配置
 # 包含前端(React) + 后端(FastAPI) 的完整部署方案
 
-version: '3.8'
-
 services:
   # 🔧 后端API服务
   backend:
