@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // 创建 axios 实例
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://jobbackend.kaiwk.com', 
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'https://jobbackend.kaiwk.com', 
   headers: {
     'Content-Type': 'application/json',
   },
