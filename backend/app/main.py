@@ -71,6 +71,7 @@ app.add_middleware(
         "http://agent-frontend",
         "http://agent-frontend:5173",
         "http://124.170.182.254:5173",
+        "https://jobfrontend.kaiwk.com",
     ],
     allow_credentials=True,
     allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
