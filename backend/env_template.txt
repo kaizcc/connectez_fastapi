@@ -1,0 +1,145 @@
+# 🔑 环境变量配置模板
+# 复制此文件为 .env 并填入你的实际配置值
+
+# ===========================================
+# 🗄️ 数据库配置 (必填)
+# ===========================================
+
+# Supabase项目URL
+# 格式: https://your-project-id.supabase.co
+SUPABASE_URL=
+
+# Supabase匿名密钥 (anon key)
+# 在Supabase控制台 -> Settings -> API 中获取
+SUPABASE_KEY=
+
+# Supabase数据库连接字符串
+# 格式: postgresql://postgres:your-password@db.your-project-id.supabase.co:5432/postgres
+# ⚠️ 注意替换 your-password 为你的数据库密码
+SUPABASE_DB_STRING=
+
+# ===========================================
+# 🌐 应用配置 (可选)
+# ===========================================
+
+# 调试模式
+DEBUG=True
+
+# 日志级别 (DEBUG, INFO, WARNING, ERROR)
+LOG_LEVEL=INFO
+
+# 应用端口 (默认8000)
+PORT=8000
+
+# 允许的CORS源 (多个用逗号分隔)
+CORS_ORIGINS=http://localhost:5173,http://localhost:3000
+
+# ===========================================
+# 🌐 浏览器配置 (Docker部署时自动设置)
+# ===========================================
+
+# 是否强制无头模式 (Docker中建议为true)
+HEADLESS=true
+
+# 显示环境 (Linux无桌面环境需要)
+DISPLAY=:99
+
+# Playwright浏览器路径
+PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+
+# Chrome/Chromium可执行文件路径 (可选)
+# CHROME_PATH=/usr/bin/google-chrome
+
+# ===========================================
+# 🔧 AI模型配置 (可选)
+# ===========================================
+
+# OpenAI API密钥 (如果使用OpenAI模型)
+# OPENAI_API_KEY=
+
+# Google API密钥 (如果使用Google模型)
+# GOOGLE_API_KEY=
+
+# Anthropic API密钥 (如果使用Claude模型)
+# ANTHROPIC_API_KEY=
+
+# Ollama服务地址 (如果使用本地Ollama)
+# OLLAMA_BASE_URL=http://localhost:11434
+
+# ===========================================
+# 📊 监控和日志 (可选)
+# ===========================================
+
+# 日志文件路径
+# LOG_FILE_PATH=./logs/app.log
+
+# 最大日志文件大小 (MB)
+# MAX_LOG_FILE_SIZE=10
+
+# 保留日志文件数量
+# LOG_BACKUP_COUNT=5
+
+# ===========================================
+# 🔒 安全配置 (生产环境推荐)
+# ===========================================
+
+# JWT密钥 (生产环境必须设置)
+# JWT_SECRET_KEY=your-super-secret-jwt-key
+
+# 会话超时时间 (秒)
+# SESSION_TIMEOUT=3600
+
+# API限流配置
+# RATE_LIMIT_PER_MINUTE=60
+
+# ===========================================
+# 📝 配置说明
+# ===========================================
+
+# 1. 必填项目:
+#    - SUPABASE_URL: 你的Supabase项目URL
+#    - SUPABASE_KEY: Supabase匿名密钥
+#    - SUPABASE_DB_STRING: 数据库连接字符串
+
+# 2. 获取Supabase配置:
+#    - 登录 https://supabase.com
+#    - 选择你的项目
+#    - Settings -> API 页面获取URL和Key
+#    - Settings -> Database 页面获取连接字符串
+
+# 3. 本地开发:
+#    cp env_template.txt .env
+#    # 编辑 .env 文件填入配置
+#    uv run uvicorn app.main:app --reload
+
+# 4. Docker部署:
+#    # .env 文件会自动被docker-compose读取
+#    docker-compose up --build
+
+# 5. 注意事项:
+#    - .env文件包含敏感信息，不要提交到Git
+#    - 生产环境建议使用环境变量而非.env文件
+#    - 数据库密码如含特殊字符需要URL编码
+
+# ===========================================
+# 🆘 故障排除
+# ===========================================
+
+# 如果遇到数据库连接问题:
+# 1. 检查SUPABASE_DB_STRING中的密码是否正确
+# 2. 确认Supabase项目是否处于活跃状态
+# 3. 验证网络连接是否正常
+
+# 如果遇到浏览器启动问题:
+# 1. Linux环境确保安装了必要的系统依赖
+# 2. Docker环境检查容器权限配置
+# 3. 确认HEADLESS=true在无桌面环境中
+
+# 测试配置是否正确:
+# uv run python -c "
+# import os
+# from dotenv import load_dotenv
+# load_dotenv()
+# print('SUPABASE_URL:', os.getenv('SUPABASE_URL'))
+# print('SUPABASE_KEY:', os.getenv('SUPABASE_KEY')[:20] + '...' if os.getenv('SUPABASE_KEY') else None)
+# "

@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  fastapi-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      # 数据库连接配置
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
+      - SUPABASE_DB_STRING=${SUPABASE_DB_STRING}
+      
+      # 浏览器配置
+      - DISPLAY=:99
+      - HEADLESS=true
+      - PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+      
+      # 应用配置
+      - DEBUG=false
+      - LOG_LEVEL=INFO
+      - PYTHONUNBUFFERED=1
+    
+    volumes:
+      # 如果需要持久化数据，可以挂载卷
+      - ./logs:/app/logs
+    
+    # 安全配置
+    security_opt:
+      - seccomp:unconfined  # Chromium需要
+    
+    # 资源限制
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+    
+    # 健康检查
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    
+    # 重启策略
+    restart: unless-stopped
+
+  # 可选：添加Redis缓存（如果需要）
+  # redis:
+  #   image: redis:7-alpine
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis_data:/data
+  #   restart: unless-stopped
+
+# volumes:
+#   redis_data:

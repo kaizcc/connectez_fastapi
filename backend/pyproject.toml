@@ -1,0 +1,45 @@
+[project]
+name = "aipocket"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "psutil>=5.9.0", # 用于浏览器进程管理和清理
+    "fastapi[standard]>=0.115.6",
+    "psycopg2-binary>=2.9.10",
+    "python-dotenv>=1.0.1",
+    "sqlalchemy>=2.0.36",
+    "sqlmodel>=0.0.22",
+    "supabase>=2.10.0",
+    # Browser automation and AI dependencies
+    "browser-use==0.2.5",
+    "langchain>=0.3.14",
+    "langchain-google-genai>=2.1.1",
+    "langchain-ollama>=0.2.2",
+    "langchain-openai>=0.2.14",
+    "langchain-anthropic>=0.2.0",
+    "Pillow>=10.1.0",
+    "openai>=1.59.5",
+    "pydantic>=2.10.5",
+    "uvicorn>=0.22.0",
+    "playwright>=1.40.0",
+    "pydantic-settings>=2.0.0",
+    "asyncio>=3.4.3",
+    # agent task
+    "selenium==4.35.0",
+    "pandas>=2.2.2",
+]
+
+[tool.ruff]
+extend-exclude = ["*.ipynb"]
+include = ["app/**.py"]
+
+[tool.ruff.lint]
+ignore = ["E721", "E731"]
+extend-select = ["I"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.4",
+]
