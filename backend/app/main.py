@@ -67,6 +67,10 @@ app.add_middleware(
         "http://127.0.0.1:3000",  # React dev server (127.0.0.1)
         "http://localhost:8081",  # Original config
         "http://127.0.0.1:8081",  # Original config (127.0.0.1)
+        "https://connectez.co",
+        "http://agent-frontend",
+        "http://agent-frontend:5173",
+        "http://124.170.182.254:5173",
     ],
     allow_credentials=True,
     allow_methods=["*"],  # Allow all methods (GET, POST, etc.)

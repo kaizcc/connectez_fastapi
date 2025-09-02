@@ -1,0 +1,187 @@
+# 🚀 完整全栈应用 Docker Compose 配置
+# 包含前端(React) + 后端(FastAPI) 的完整部署方案
+
+version: '3.8'
+
+services:
+  # 🔧 后端API服务
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      # 数据库连接配置
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
+      - SUPABASE_DB_STRING=${SUPABASE_DB_STRING}
+      
+      # 浏览器配置
+      - DISPLAY=:99
+      - HEADLESS=true
+      - PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+      
+      # 应用配置
+      - DEBUG=false
+      - LOG_LEVEL=INFO
+      - PYTHONUNBUFFERED=1
+    
+    volumes:
+      # 日志持久化
+      - ./logs/backend:/app/logs
+    
+    # 安全配置
+    security_opt:
+      - seccomp:unconfined  # Chromium需要
+    
+    # 资源限制
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+    
+    # 健康检查
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # 🌐 前端Web服务
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: production
+    ports:
+      - "8010:80"
+    environment:
+      # API连接配置
+      - VITE_API_BASE_URL=http://backend:8000
+      - NODE_ENV=production
+    
+    volumes:
+      # 日志持久化
+      - ./logs/frontend:/var/log/nginx
+    
+    # 资源限制
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 128M
+          cpus: '0.1'
+    
+    # 健康检查
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    # 依赖后端服务
+    depends_on:
+      backend:
+        condition: service_healthy
+    
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # 📊 可选: Redis缓存服务
+  # redis:
+  #   image: redis:7-alpine
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis_data:/data
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 256M
+  #         cpus: '0.2'
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "ping"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #   restart: unless-stopped
+  #   networks:
+  #     - app-network
+
+  # 🔍 可选: 监控服务 (Prometheus + Grafana)
+  # prometheus:
+  #   image: prom/prometheus:latest
+  #   ports:
+  #     - "9090:9090"
+  #   volumes:
+  #     - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+  #     - prometheus_data:/prometheus
+  #   command:
+  #     - '--config.file=/etc/prometheus/prometheus.yml'
+  #     - '--storage.tsdb.path=/prometheus'
+  #     - '--web.console.libraries=/etc/prometheus/console_libraries'
+  #     - '--web.console.templates=/etc/prometheus/consoles'
+  #     - '--web.enable-lifecycle'
+  #   networks:
+  #     - app-network
+
+  # grafana:
+  #   image: grafana/grafana:latest
+  #   ports:
+  #     - "3001:3000"
+  #   environment:
+  #     - GF_SECURITY_ADMIN_PASSWORD=admin
+  #   volumes:
+  #     - grafana_data:/var/lib/grafana
+  #   networks:
+  #     - app-network
+
+# 🌐 网络配置
+networks:
+  app-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# 💾 数据卷配置
+volumes:
+  # redis_data:
+  #   driver: local
+  # prometheus_data:
+  #   driver: local
+  # grafana_data:
+  #   driver: local
+  
+  # 日志卷 (可选,如果不想使用bind mount)
+  backend_logs:
+    driver: local
+  frontend_logs:
+    driver: local
+
+# 🏷️ 标签和元数据
+x-common-variables: &common-variables
+  TZ: Asia/Shanghai
+  
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+# 可以为所有服务应用通用配置
+# logging: *default-logging
