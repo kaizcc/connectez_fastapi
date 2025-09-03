@@ -10,6 +10,7 @@ services:
       - SUPABASE_URL=${SUPABASE_URL}
       - SUPABASE_KEY=${SUPABASE_KEY}
       - SUPABASE_DB_STRING=${SUPABASE_DB_STRING}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
       
       # AI模型API密钥配置
       - OPENAI_API_KEY=${OPENAI_API_KEY}
@@ -42,6 +43,9 @@ services:
       - PYTHONUNBUFFERED=1
       - FRONTEND_URL=${FRONTEND_URL}
       - DEV_ENV=${DEV_ENV}
+
+      # 循环任务验证
+      - API_AUTH_TOKEN=${API_AUTH_TOKEN}
     
     volumes:
       # 如果需要持久化数据，可以挂载卷

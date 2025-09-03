@@ -7,7 +7,7 @@ import math
 from typing import Optional
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, Query, BackgroundTasks
+from fastapi import APIRouter, HTTPException, Query, BackgroundTasks, Depends
 
 from .dependencies import DBSessionDependency, UserDependency
 from .schemas import (
@@ -15,9 +15,12 @@ from .schemas import (
     AgentFoundJobResponse, AgentFoundJobUpdate,
     SeekScraperRequest, SeekScraperResponse,
     ResumeJobMatchingRequest, ResumeJobMatchingResponse,
-    JobAgentRequest, JobAgentResponse
+    JobAgentRequest, JobAgentResponse,
+    JobRecurringFirstRequest, JobRecurringFirstResponse
 )
 from .service import TaskService, JobAgentService
+from .service.job_recurring_service import JobRecurringService, verify_api_token
+from .service.job_recurring_first_service import JobRecurringFirstService
 from ..db.models import Resumes
 from sqlmodel import select
 
@@ -350,3 +353,82 @@ def get_found_job(
     except Exception as e:
         logger.error(f"Error getting found job {job_id}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/recurring-first", response_model=JobRecurringFirstResponse, tags=["recurring-tasks"])
+async def create_recurring_task(
+    recurring_request: JobRecurringFirstRequest,
+    current_user: UserDependency,
+    db: DBSessionDependency,
+    background_tasks: BackgroundTasks
+):
+    """
+    创建循环任务并立即执行第一次
+    
+    这是用户级接口，用于创建新的循环任务：
+    1. 创建循环任务记录
+    2. 立即执行第一次任务（包含爬虫+AI匹配）
+    3. 计算下一次执行时间
+    4. 后续由GitHub Actions自动触发执行
+    
+    功能：
+    - 复用Job Agent的完整逻辑
+    - 支持自定义循环间隔（小时为单位）
+    - 支持最大执行次数限制
+    - 立即执行并返回结果
+    
+    认证：普通用户Token认证
+    """
+    try:
+        logger.info(f"Creating recurring task for user {current_user.id}")
+        
+        # 创建循环任务首次执行服务
+        recurring_first_service = JobRecurringFirstService()
+        
+        # 执行创建和首次执行
+        result = await recurring_first_service.create_and_execute_recurring_task(
+            db=db,
+            user_id=current_user.id,
+            recurring_request=recurring_request
+        )
+        
+        return JobRecurringFirstResponse(**result)
+        
+    except Exception as e:
+        logger.error(f"Error in recurring task creation endpoint: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/recurring-jobs", tags=["recurring-tasks"])
+async def process_recurring_jobs(
+    _: bool = Depends(verify_api_token)
+):
+    """
+    处理所有待执行的循环任务
+    
+    这是一个系统级接口，供GitHub Actions等自动化服务调用。
+    要求Bearer Token认证，处理所有用户的循环任务。
+    
+    功能：
+    1. 查询所有待执行的循环任务
+    2. 批量异步执行任务（复用job-agent逻辑）
+    3. 更新执行记录和下次执行时间
+    4. 管理任务生命周期（最大执行次数控制）
+    
+    认证：需要在请求头中包含 Authorization: Bearer {API_AUTH_TOKEN}
+    """
+    try:
+        logger.info("Starting recurring jobs processing via API")
+        
+        # 创建循环任务服务
+        recurring_service = JobRecurringService()
+        
+        # 处理所有待执行的循环任务
+        result = await recurring_service.process_all_recurring_tasks()
+        
+        logger.info(f"Recurring jobs processing completed: {result}")
+        return result
+        
+    except Exception as e:
+        logger.error(f"Error in recurring jobs processing endpoint: {e}")
+        raise HTTPException(status_code=500, detail=f"Recurring jobs processing failed: {str(e)}")

@@ -149,3 +149,46 @@ class JobAgentResponse(BaseModel):
     ai_model: str
     average_score: float
     processing_time: float
+
+
+# Job Recurring First 循环任务首次创建 Schemas
+class JobRecurringFirstRequest(BaseModel):
+    """循环任务首次创建请求参数 - 结合Job Agent功能和循环配置"""
+    job_titles: List[str] = Field(..., description="要搜索的职位标题列表")
+    location: str = Field(default="Sydney NSW", description="搜索地点")
+    job_required: int = Field(default=5, ge=1, le=50, description="需要的有效工作数量")
+    resume_id: UUID = Field(..., description="要分析的简历ID")
+    ai_model: str = Field(default="deepseek", description="使用的AI模型")
+    task_description: Optional[str] = Field(default=None, description="任务描述")
+    
+    # 循环任务特有配置
+    recurrence_config: Dict[str, Any] = Field(..., description="循环配置，如 {'unit': 'hours', 'value': 6}")
+    max_executions: Optional[int] = Field(default=None, description="最大执行次数，null表示无限制")
+
+
+class JobRecurringFirstResponse(BaseModel):
+    """循环任务首次创建响应"""
+    task_id: UUID
+    message: str
+    
+    # 首次执行结果
+    first_execution: Dict[str, Any]
+    jobs_found: int
+    jobs_analyzed: int
+    successful_analyses: int
+    failed_analyses: int
+    resume_id: UUID
+    ai_model: str
+    average_score: float
+    processing_time: float
+    
+    # 循环任务配置
+    is_recurring: bool
+    recurrence_config: Dict[str, Any]
+    max_executions: Optional[int]
+    execution_count: int
+    next_execution_at: Optional[datetime]
+    
+    # 任务状态
+    status: str
+    is_active: bool

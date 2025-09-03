@@ -9,69 +9,6 @@ resolution-markers = [
 ]
 
 [[package]]
-name = "aipocket"
-version = "0.1.0"
-source = { virtual = "." }
-dependencies = [
-    { name = "asyncio" },
-    { name = "browser-use" },
-    { name = "fastapi", extra = ["standard"] },
-    { name = "langchain" },
-    { name = "langchain-anthropic" },
-    { name = "langchain-google-genai" },
-    { name = "langchain-ollama" },
-    { name = "langchain-openai" },
-    { name = "openai" },
-    { name = "pandas" },
-    { name = "pillow" },
-    { name = "playwright" },
-    { name = "psutil" },
-    { name = "psycopg2-binary" },
-    { name = "pydantic" },
-    { name = "pydantic-settings" },
-    { name = "python-dotenv" },
-    { name = "selenium" },
-    { name = "sqlalchemy" },
-    { name = "sqlmodel" },
-    { name = "supabase" },
-    { name = "uvicorn" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "pytest" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "asyncio", specifier = ">=3.4.3" },
-    { name = "browser-use", specifier = "==0.2.5" },
-    { name = "fastapi", extras = ["standard"], specifier = ">=0.115.6" },
-    { name = "langchain", specifier = ">=0.3.14" },
-    { name = "langchain-anthropic", specifier = ">=0.2.0" },
-    { name = "langchain-google-genai", specifier = ">=2.1.1" },
-    { name = "langchain-ollama", specifier = ">=0.2.2" },
-    { name = "langchain-openai", specifier = ">=0.2.14" },
-    { name = "openai", specifier = ">=1.59.5" },
-    { name = "pandas", specifier = ">=2.2.2" },
-    { name = "pillow", specifier = ">=10.1.0" },
-    { name = "playwright", specifier = ">=1.40.0" },
-    { name = "psutil", specifier = ">=5.9.0" },
-    { name = "psycopg2-binary", specifier = ">=2.9.10" },
-    { name = "pydantic", specifier = ">=2.10.5" },
-    { name = "pydantic-settings", specifier = ">=2.0.0" },
-    { name = "python-dotenv", specifier = ">=1.0.1" },
-    { name = "selenium", specifier = "==4.35.0" },
-    { name = "sqlalchemy", specifier = ">=2.0.36" },
-    { name = "sqlmodel", specifier = ">=0.0.22" },
-    { name = "supabase", specifier = ">=2.10.0" },
-    { name = "uvicorn", specifier = ">=0.22.0" },
-]
-
-[package.metadata.requires-dev]
-dev = [{ name = "pytest", specifier = ">=8.3.4" }]
-
-[[package]]
 name = "annotated-types"
 version = "0.7.0"
 source = { registry = "https://pypi.org/simple" }
@@ -353,6 +290,69 @@ sdist = { url = "https://files.pythonhosted.org/packages/d8/53/6f443c9a4a8358a93
 wheels = [
     { url = "https://files.pythonhosted.org/packages/d1/d6/3965ed04c63042e047cb6a3e6ed1a63a35087b6a609aa3a15ed8ac56c221/colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6", size = 25335, upload-time = "2022-10-25T02:36:20.889Z" },
 ]
+
+[[package]]
+name = "connectez-agent"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "asyncio" },
+    { name = "browser-use" },
+    { name = "fastapi", extra = ["standard"] },
+    { name = "langchain" },
+    { name = "langchain-anthropic" },
+    { name = "langchain-google-genai" },
+    { name = "langchain-ollama" },
+    { name = "langchain-openai" },
+    { name = "openai" },
+    { name = "pandas" },
+    { name = "pillow" },
+    { name = "playwright" },
+    { name = "psutil" },
+    { name = "psycopg2-binary" },
+    { name = "pydantic" },
+    { name = "pydantic-settings" },
+    { name = "python-dotenv" },
+    { name = "selenium" },
+    { name = "sqlalchemy" },
+    { name = "sqlmodel" },
+    { name = "supabase" },
+    { name = "uvicorn" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "pytest" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "asyncio", specifier = ">=3.4.3" },
+    { name = "browser-use", specifier = "==0.2.5" },
+    { name = "fastapi", extras = ["standard"], specifier = ">=0.115.6" },
+    { name = "langchain", specifier = ">=0.3.14" },
+    { name = "langchain-anthropic", specifier = ">=0.2.0" },
+    { name = "langchain-google-genai", specifier = ">=2.1.1" },
+    { name = "langchain-ollama", specifier = ">=0.2.2" },
+    { name = "langchain-openai", specifier = ">=0.2.14" },
+    { name = "openai", specifier = ">=1.59.5" },
+    { name = "pandas", specifier = ">=2.2.2" },
+    { name = "pillow", specifier = ">=10.1.0" },
+    { name = "playwright", specifier = ">=1.40.0" },
+    { name = "psutil", specifier = ">=5.9.0" },
+    { name = "psycopg2-binary", specifier = ">=2.9.10" },
+    { name = "pydantic", specifier = ">=2.10.5" },
+    { name = "pydantic-settings", specifier = ">=2.0.0" },
+    { name = "python-dotenv", specifier = ">=1.0.1" },
+    { name = "selenium", specifier = "==4.35.0" },
+    { name = "sqlalchemy", specifier = ">=2.0.36" },
+    { name = "sqlmodel", specifier = ">=0.0.22" },
+    { name = "supabase", specifier = ">=2.10.0" },
+    { name = "uvicorn", specifier = ">=0.22.0" },
+]
+
+[package.metadata.requires-dev]
+dev = [{ name = "pytest", specifier = ">=8.3.4" }]
 
 [[package]]
 name = "cython"

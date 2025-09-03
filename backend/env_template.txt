@@ -18,6 +18,10 @@ SUPABASE_KEY=
 # ⚠️ 注意替换 your-password 为你的数据库密码
 SUPABASE_DB_STRING=
 
+# Supabase Service Role密钥 (系统级操作)
+# 用于绕过RLS限制的系统级操作，如循环任务处理
+SUPABASE_SERVICE_ROLE_KEY=
+
 # ===========================================
 # 🌐 应用配置 (可选)
 # ===========================================
@@ -85,6 +89,10 @@ PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
 # JWT密钥 (生产环境必须设置)
 # JWT_SECRET_KEY=your-super-secret-jwt-key
+
+# API认证Token (系统级接口保护)
+# 用于GitHub Actions等系统调用的认证
+API_AUTH_TOKEN=
 
 # 会话超时时间 (秒)
 # SESSION_TIMEOUT=3600

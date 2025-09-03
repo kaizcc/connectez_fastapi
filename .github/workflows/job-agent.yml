@@ -1,0 +1,14 @@
+name: Recurring Jobs
+on:
+  schedule:
+    - cron: '0 * * * *'  # 每小时执行
+
+jobs:
+  process-recurring-tasks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Recurring Jobs
+        run: |
+          curl -X POST https://jobbackend.kaiwk.com/tasks/recurring-jobs \
+               -H "Authorization: Bearer ${{ secrets.API_AUTH_TOKEN }}" \
+               -H "Content-Type: application/json"
