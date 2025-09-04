@@ -96,16 +96,16 @@ class TaskProcessor:
                 task_description=f"Recurring task: {task.task_description}"
             )
             
-            # 4. 创建JobAgentService并执行任务
+            # 4. 创建JobAgentService并执行循环任务
             job_agent_service = JobAgentService(ai_model=instructions["ai_model"])
             
-            # 使用常规数据库会话执行任务（JobAgentService内部会处理用户权限）
-            with Session(self.service_db.engine) as regular_session:
-                result = await job_agent_service.execute_job_agent_task(
-                    db=regular_session,
-                    user_id=task.user_id,
-                    job_request=job_request
-                )
+            # 使用新的循环任务专用方法，不创建新任务
+            result = await job_agent_service.execute_recurring_job_task(
+                db=db,  # 使用Service Role的session
+                user_id=task.user_id,
+                job_request=job_request,
+                existing_task=task  # 传入现有的循环任务
+            )
             
             # 5. 更新循环任务状态（保持recurring状态）
             self._update_recurring_task_after_execution(db, task)
@@ -116,7 +116,7 @@ class TaskProcessor:
                 "user_id": task.user_id,
                 "success": True,
                 "jobs_found": result.get("jobs_found", 0),
-                "processing_time": result.get("processing_time", 0)
+                "processing_time": result.get("processing_time_seconds", 0)
             }
             
         except Exception as e:

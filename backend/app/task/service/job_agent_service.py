@@ -169,6 +169,93 @@ class JobAgentService:
             
             raise
     
+    async def execute_recurring_job_task(
+        self,
+        db: Session,
+        user_id: UUID,
+        job_request: JobAgentRequest,
+        existing_task: AgentTasks
+    ) -> Dict[str, Any]:
+        """
+        执行循环任务的求职处理（不创建新任务）
+        
+        专门为循环任务设计，复用核心业务逻辑但跳过任务管理部分
+        
+        Args:
+            db: 数据库会话
+            user_id: 用户ID
+            job_request: 任务请求参数
+            existing_task: 现有的循环任务对象
+            
+        Returns:
+            执行结果（不包含任务状态更新）
+        """
+        start_time = time.time()
+        
+        try:
+            logger.info(f"Starting recurring job task for existing task {existing_task.id}")
+            
+            # 1. 验证简历存在（复用现有逻辑）
+            resume = await self._get_user_resume(db, user_id, job_request.resume_id)
+            if not resume:
+                raise ValueError(f"Resume {job_request.resume_id} not found or not accessible")
+            
+            # 2. 执行爬虫阶段（复用现有逻辑）
+            logger.info(f"Starting scraping phase for recurring task {existing_task.id}")
+            scraper_service = SeekScraperService()
+            jobs_found = await scraper_service.scrape_jobs_async(
+                job_titles=job_request.job_titles,
+                location=job_request.location,
+                job_required=job_request.job_required,
+                task_id=existing_task.id,  # 使用现有任务的ID
+                user_id=user_id,
+                db=db
+            )
+            
+            logger.info(f"Scraping completed: found {len(jobs_found)} jobs")
+            
+            # 3. 执行AI匹配分析阶段（复用现有逻辑）
+            if jobs_found:
+                logger.info(f"Starting AI analysis phase for {len(jobs_found)} jobs")
+                analysis_results = await self._analyze_jobs_with_resume(
+                    db, resume, jobs_found, existing_task.id
+                )
+                
+                successful_analyses = sum(1 for r in analysis_results if r.analysis_success)
+                failed_analyses = len(jobs_found) - successful_analyses
+                average_score = self._calculate_average_score(analysis_results)
+                
+                logger.info(f"AI analysis completed: {successful_analyses} successful, {failed_analyses} failed")
+            else:
+                successful_analyses = 0
+                failed_analyses = 0
+                average_score = 0.0
+                logger.warning("No jobs found to analyze")
+            
+            # 4. 返回执行结果（不更新任务状态）
+            processing_time = time.time() - start_time
+            
+            result = {
+                "jobs_found": len(jobs_found),
+                "jobs_analyzed": len(jobs_found),
+                "successful_analyses": successful_analyses,
+                "failed_analyses": failed_analyses,
+                "resume_id": job_request.resume_id,
+                "ai_model": job_request.ai_model,
+                "average_score": average_score,
+                "processing_time_seconds": round(processing_time, 2),
+                "job_titles": job_request.job_titles,
+                "location": job_request.location
+            }
+            
+            logger.info(f"Recurring job task completed for task {existing_task.id}: {len(jobs_found)} jobs found")
+            return result
+            
+        except Exception as e:
+            logger.error(f"Error in recurring job task for task {existing_task.id}: {e}")
+            # 不更新任务状态，让调用者处理错误
+            raise
+    
     async def _get_user_resume(self, db: Session, user_id: UUID, resume_id: UUID) -> Resumes:
         """获取用户简历"""
         try:
